@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { GlassCard } from './GlassCard';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 
 export function LoginPage() {
     const { signInWithGoogle, loading } = useAuth();

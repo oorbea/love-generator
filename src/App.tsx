@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import { motion } from 'framer-motion';
-import { useAuth } from './contexts/AuthContext';
+import { useAuth } from './hooks/useAuth';
 import { useReasons } from './hooks/useReasons';
 import { LoginPage } from './components/LoginPage';
 import { GlassCard } from './components/GlassCard';
