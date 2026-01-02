@@ -2,8 +2,10 @@ import { useCallback } from 'react';
 import confetti from 'canvas-confetti';
 import { motion } from 'framer-motion';
 import { useAuth } from './hooks/useAuth';
+import { useAuthorization } from './hooks/useAuthorization';
 import { useReasons } from './hooks/useReasons';
 import { LoginPage } from './components/LoginPage';
+import { UnauthorizedPage } from './components/UnauthorizedPage';
 import { GlassCard } from './components/GlassCard';
 import { GlossyButton } from './components/GlossyButton';
 import { ReasonCard } from './components/ReasonCard';
@@ -97,13 +99,19 @@ function MainContent() {
 }
 
 function App() {
-    const { user, loading } = useAuth();
+    const { user, loading: authLoading } = useAuth();
+    const { isAuthorized, isChecking } = useAuthorization(user?.email);
 
     // Show loading state
-    if (loading) {
+    if (authLoading || (user && isChecking)) {
         return (
             <div className="aero-background flex items-center justify-center min-h-screen">
-                <div className="text-white text-xl">Cargando...</div>
+                <GlassCard>
+                    <div className="text-center py-8">
+                        <div className="text-4xl mb-4 floating">💕</div>
+                        <p className="text-gray-600">Verificando acceso...</p>
+                    </div>
+                </GlassCard>
             </div>
         );
     }
@@ -113,7 +121,12 @@ function App() {
         return <LoginPage />;
     }
 
-    // Show main content if authenticated
+    // Check if user email is in the whitelist
+    if (!isAuthorized) {
+        return <UnauthorizedPage email={user.email || 'desconocido'} />;
+    }
+
+    // Show main content if authenticated and authorized
     return <MainContent />;
 }
 
