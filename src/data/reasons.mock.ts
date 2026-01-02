@@ -33,4 +33,11 @@ export const mockReasons: Reason[] = [
         imageUrl: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=400&h=300&fit=crop',
         theme: 'day',
     },
+    {
+        id: '6',
+        content: 'Porque esta canción me recuerda a ti 🎵',
+        type: 'text',
+        spotifyUrl: 'https://open.spotify.com/embed/track/3n3Ppam7vgaVa1iaRUc9Lp',
+        theme: 'night',
+    },
 ];
