@@ -13,7 +13,7 @@ import { CounterWidget } from './components/CounterWidget';
 
 function MainContent() {
     const { signOut, user } = useAuth();
-    const { currentReason, getRandomReason, viewedCount, loading } = useReasons(true);
+    const { currentReason, getRandomReason, viewedCount, loading } = useReasons();
 
     const handleNextReason = useCallback(() => {
         getRandomReason();

@@ -12,7 +12,7 @@ interface UseReasonsReturn {
     viewedCount: number;
 }
 
-export function useReasons(useMock = true): UseReasonsReturn {
+export function useReasons(): UseReasonsReturn {
     const [reasons, setReasons] = useState<Reason[]>([]);
     const [currentReason, setCurrentReason] = useState<Reason | null>(null);
     const [previousReasonId, setPreviousReasonId] = useState<string | null>(null);
@@ -20,27 +20,25 @@ export function useReasons(useMock = true): UseReasonsReturn {
     const [error, setError] = useState<string | null>(null);
     const [viewedCount, setViewedCount] = useState(0);
 
-    // Load reasons on mount
+    // Load reasons on mount - always try Firestore first
     useEffect(() => {
         async function loadReasons() {
             setLoading(true);
             setError(null);
 
             try {
-                if (useMock) {
-                    setReasons(mockReasons);
+                const fetchedReasons = await fetchReasons();
+                if (fetchedReasons.length > 0) {
+                    setReasons(fetchedReasons);
+                    console.log(`Loaded ${fetchedReasons.length} reasons from Firestore`);
                 } else {
-                    const fetchedReasons = await fetchReasons();
-                    if (fetchedReasons.length > 0) {
-                        setReasons(fetchedReasons);
-                    } else {
-                        // Fallback to mock if Firestore is empty
-                        setReasons(mockReasons);
-                    }
+                    // Fallback to mock if Firestore is empty
+                    console.log('Firestore empty, using mock data');
+                    setReasons(mockReasons);
                 }
             } catch (err) {
                 setError('Error loading reasons');
-                console.error(err);
+                console.error('Error fetching from Firestore, using mock:', err);
                 // Fallback to mock on error
                 setReasons(mockReasons);
             } finally {
@@ -49,7 +47,7 @@ export function useReasons(useMock = true): UseReasonsReturn {
         }
 
         loadReasons();
-    }, [useMock]);
+    }, []);
 
     // Get a random reason that's different from the previous one
     const getRandomReason = useCallback(() => {
