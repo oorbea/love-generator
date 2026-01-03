@@ -88,6 +88,7 @@ function MainContent({ onAdminClick, isAdmin }: MainContentProps) {
                             src={user.photoURL}
                             alt={user.displayName || 'Usuario'}
                             className="w-8 h-8 rounded-full border-2 border-white/50 shadow-md"
+                            referrerPolicy="no-referrer"
                         />
                     )}
                     <span className="hidden sm:inline text-white/90 text-sm font-medium">
