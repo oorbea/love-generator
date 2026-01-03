@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import type { Reason } from '../types/reason';
 
 const firebaseConfig = {
@@ -21,6 +22,17 @@ export const googleProvider = new GoogleAuthProvider();
 
 // Firestore
 export const db = getFirestore(app);
+
+// Storage
+export const storage = getStorage(app);
+
+// Upload image to Firebase Storage
+export async function uploadImage(file: File): Promise<string> {
+    const filename = `reasons/${Date.now()}_${file.name}`;
+    const storageRef = ref(storage, filename);
+    await uploadBytes(storageRef, file);
+    return getDownloadURL(storageRef);
+}
 
 // Fetch reasons from Firestore
 export async function fetchReasons(): Promise<Reason[]> {
