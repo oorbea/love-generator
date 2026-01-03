@@ -1,17 +1,26 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { motion } from 'framer-motion';
 import { useAuth } from './hooks/useAuth';
+import { useAuthorization } from './hooks/useAuthorization';
+import { useAdmin } from './hooks/useAdmin';
 import { useReasons } from './hooks/useReasons';
 import { LoginPage } from './components/LoginPage';
+import { UnauthorizedPage } from './components/UnauthorizedPage';
 import { GlassCard } from './components/GlassCard';
 import { GlossyButton } from './components/GlossyButton';
 import { ReasonCard } from './components/ReasonCard';
 import { CounterWidget } from './components/CounterWidget';
+import { AdminPage } from './pages/AdminPage';
 
-function MainContent() {
+interface MainContentProps {
+    onAdminClick: () => void;
+    isAdmin: boolean;
+}
+
+function MainContent({ onAdminClick, isAdmin }: MainContentProps) {
     const { signOut, user } = useAuth();
-    const { currentReason, getRandomReason, viewedCount, loading } = useReasons(true);
+    const { currentReason, getRandomReason, viewedCount, loading } = useReasons();
 
     const handleNextReason = useCallback(() => {
         getRandomReason();
@@ -59,17 +68,41 @@ function MainContent() {
                     <span className="text-white font-semibold text-shadow">Love Generator</span>
                 </motion.div>
 
-                <motion.button
+                <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="text-white/80 hover:text-white text-sm flex items-center gap-2 transition-colors"
-                    onClick={handleSignOut}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    className="flex items-center gap-3"
                 >
-                    <span className="hidden sm:inline">{user?.displayName || 'Usuario'}</span>
-                    <span>Salir</span>
-                </motion.button>
+                    {isAdmin && (
+                        <motion.button
+                            className="text-white/80 hover:text-white text-sm px-3 py-1 rounded-full bg-purple-500/50 hover:bg-purple-500/70 transition-colors"
+                            onClick={onAdminClick}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            ⚙️ Admin
+                        </motion.button>
+                    )}
+                    {user?.photoURL && (
+                        <img
+                            src={user.photoURL}
+                            alt={user.displayName || 'Usuario'}
+                            className="w-8 h-8 rounded-full border-2 border-white/50 shadow-md"
+                            referrerPolicy="no-referrer"
+                        />
+                    )}
+                    <span className="hidden sm:inline text-white/90 text-sm font-medium">
+                        {user?.displayName || 'Usuario'}
+                    </span>
+                    <motion.button
+                        className="text-white/80 hover:text-white text-sm px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                        onClick={handleSignOut}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        Salir
+                    </motion.button>
+                </motion.div>
             </header>
 
             {/* Main Content */}
@@ -97,13 +130,21 @@ function MainContent() {
 }
 
 function App() {
-    const { user, loading } = useAuth();
+    const { user, loading: authLoading } = useAuth();
+    const { isAuthorized, isChecking } = useAuthorization(user?.email);
+    const { isAdmin } = useAdmin(user?.email);
+    const [showAdmin, setShowAdmin] = useState(false);
 
     // Show loading state
-    if (loading) {
+    if (authLoading || (user && isChecking)) {
         return (
             <div className="aero-background flex items-center justify-center min-h-screen">
-                <div className="text-white text-xl">Cargando...</div>
+                <GlassCard>
+                    <div className="text-center py-8">
+                        <div className="text-4xl mb-4 floating">💕</div>
+                        <p className="text-gray-600">Verificando acceso...</p>
+                    </div>
+                </GlassCard>
             </div>
         );
     }
@@ -113,8 +154,23 @@ function App() {
         return <LoginPage />;
     }
 
-    // Show main content if authenticated
-    return <MainContent />;
+    // Check if user email is in the whitelist
+    if (!isAuthorized) {
+        return <UnauthorizedPage email={user.email || 'desconocido'} />;
+    }
+
+    // Show admin page if selected
+    if (showAdmin && isAdmin) {
+        return <AdminPage onBack={() => setShowAdmin(false)} />;
+    }
+
+    // Show main content if authenticated and authorized
+    return (
+        <MainContent
+            onAdminClick={() => setShowAdmin(true)}
+            isAdmin={isAdmin}
+        />
+    );
 }
 
 export default App;

@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Reason } from '../types/reason';
+import { SpotifyEmbed } from './SpotifyEmbed';
 
 interface ReasonCardProps {
     reason: Reason | null;
@@ -53,6 +54,13 @@ export function ReasonCard({ reason }: ReasonCardProps) {
                             loading="lazy"
                         />
                     </motion.div>
+                )}
+
+                {/* Spotify Embed (if spotifyUrl exists) */}
+                {reason.spotifyUrl && (
+                    <div className="max-w-md mx-auto">
+                        <SpotifyEmbed url={reason.spotifyUrl} />
+                    </div>
                 )}
             </motion.div>
         </AnimatePresence>
