@@ -1,9 +1,7 @@
 services:
   love-generator:
     container_name: love-generator
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/oorbea/love-generator:latest
     expose:
       - "80"
     environment:
