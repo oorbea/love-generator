@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
     signInWithPopup,
     signOut as firebaseSignOut,
@@ -6,15 +6,7 @@ import {
     type User
 } from 'firebase/auth';
 import { auth, googleProvider } from '../services/firebase';
-
-export interface AuthContextType {
-    user: User | null;
-    loading: boolean;
-    signInWithGoogle: () => Promise<void>;
-    signOut: () => Promise<void>;
-}
-
-export const AuthContext = createContext<AuthContextType | null>(null);
+import { AuthContext } from './authContext';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);

@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
     collection,
     getDocs,
     addDoc,
+    updateDoc,
     deleteDoc,
     doc,
     getDoc,
     setDoc
 } from 'firebase/firestore';
 import { db } from '../services/firebase';
+import { uploadToCloudinary } from '../services/cloudinary';
 import { useAuth } from '../hooks/useAuth';
 import { useAdmin } from '../hooks/useAdmin';
 import { GlassCard } from '../components/GlassCard';
@@ -31,13 +33,19 @@ export function AdminPage({ onBack }: AdminPageProps) {
     // Form states
     const [newReason, setNewReason] = useState({ content: '', type: 'text', imageUrl: '', spotifyUrl: '' });
     const [newEmail, setNewEmail] = useState('');
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editForm, setEditForm] = useState({ content: '', type: 'text', imageUrl: '', spotifyUrl: '' });
+
+    // Image upload states
+    const [uploading, setUploading] = useState(false);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Load data
     useEffect(() => {
         async function loadData() {
             setLoading(true);
             try {
-                // Load reasons
                 const reasonsSnapshot = await getDocs(collection(db, 'reasons'));
                 const reasonsData = reasonsSnapshot.docs.map(d => ({
                     id: d.id,
@@ -45,7 +53,6 @@ export function AdminPage({ onBack }: AdminPageProps) {
                 })) as Reason[];
                 setReasons(reasonsData);
 
-                // Load allowed emails
                 const configDoc = await getDoc(doc(db, 'config', 'allowedUsers'));
                 if (configDoc.exists()) {
                     setAllowedEmails(configDoc.data().emails || []);
@@ -62,6 +69,39 @@ export function AdminPage({ onBack }: AdminPageProps) {
         }
     }, [isAdmin]);
 
+    // Handle image file selection
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>, isEdit = false) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Preview
+        const reader = new FileReader();
+        reader.onload = (e) => setImagePreview(e.target?.result as string);
+        reader.readAsDataURL(file);
+
+        // Upload to Imgur
+        setUploading(true);
+        try {
+            const result = await uploadToCloudinary(file);
+            if (result.success && result.url) {
+                if (isEdit) {
+                    setEditForm({ ...editForm, imageUrl: result.url, type: 'image' });
+                } else {
+                    setNewReason({ ...newReason, imageUrl: result.url, type: 'image' });
+                }
+            } else {
+                alert(result.error || 'Error al subir la imagen');
+                setImagePreview(null);
+            }
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            alert('Error al subir la imagen');
+            setImagePreview(null);
+        } finally {
+            setUploading(false);
+        }
+    };
+
     // Add reason
     const handleAddReason = async () => {
         if (!newReason.content.trim()) return;
@@ -77,9 +117,48 @@ export function AdminPage({ onBack }: AdminPageProps) {
             const docRef = await addDoc(collection(db, 'reasons'), reasonData);
             setReasons([...reasons, { id: docRef.id, ...reasonData }]);
             setNewReason({ content: '', type: 'text', imageUrl: '', spotifyUrl: '' });
+            setImagePreview(null);
         } catch (error) {
             console.error('Error adding reason:', error);
         }
+    };
+
+    // Start editing
+    const handleStartEdit = (reason: Reason) => {
+        setEditingId(reason.id);
+        setEditForm({
+            content: reason.content,
+            type: reason.type,
+            imageUrl: reason.imageUrl || '',
+            spotifyUrl: reason.spotifyUrl || ''
+        });
+    };
+
+    // Save edit
+    const handleSaveEdit = async () => {
+        if (!editingId || !editForm.content.trim()) return;
+
+        try {
+            const reasonData = {
+                content: editForm.content,
+                type: editForm.type as 'text' | 'image',
+                ...(editForm.imageUrl && { imageUrl: editForm.imageUrl }),
+                ...(editForm.spotifyUrl && { spotifyUrl: editForm.spotifyUrl }),
+            };
+
+            await updateDoc(doc(db, 'reasons', editingId), reasonData);
+            setReasons(reasons.map(r => r.id === editingId ? { ...r, ...reasonData } : r));
+            setEditingId(null);
+            setEditForm({ content: '', type: 'text', imageUrl: '', spotifyUrl: '' });
+        } catch (error) {
+            console.error('Error updating reason:', error);
+        }
+    };
+
+    // Cancel edit
+    const handleCancelEdit = () => {
+        setEditingId(null);
+        setEditForm({ content: '', type: 'text', imageUrl: '', spotifyUrl: '' });
     };
 
     // Delete reason
@@ -170,18 +249,14 @@ export function AdminPage({ onBack }: AdminPageProps) {
                 <div className="flex gap-2 mb-4">
                     <button
                         onClick={() => setActiveTab('reasons')}
-                        className={`px-4 py-2 rounded-full transition-colors ${activeTab === 'reasons'
-                                ? 'bg-pink-500 text-white'
-                                : 'bg-white/30 text-gray-800'
+                        className={`px-4 py-2 rounded-full transition-colors ${activeTab === 'reasons' ? 'bg-pink-500 text-white' : 'bg-white/30 text-gray-800'
                             }`}
                     >
                         💕 Razones ({reasons.length})
                     </button>
                     <button
                         onClick={() => setActiveTab('emails')}
-                        className={`px-4 py-2 rounded-full transition-colors ${activeTab === 'emails'
-                                ? 'bg-pink-500 text-white'
-                                : 'bg-white/30 text-gray-800'
+                        className={`px-4 py-2 rounded-full transition-colors ${activeTab === 'emails' ? 'bg-pink-500 text-white' : 'bg-white/30 text-gray-800'
                             }`}
                     >
                         📧 Emails ({allowedEmails.length})
@@ -203,7 +278,7 @@ export function AdminPage({ onBack }: AdminPageProps) {
                                     className="w-full p-3 rounded-lg border border-gray-200 resize-none"
                                     rows={2}
                                 />
-                                <div className="flex gap-2 flex-wrap">
+                                <div className="flex gap-2 flex-wrap items-center">
                                     <select
                                         value={newReason.type}
                                         onChange={(e) => setNewReason({ ...newReason, type: e.target.value })}
@@ -212,22 +287,56 @@ export function AdminPage({ onBack }: AdminPageProps) {
                                         <option value="text">Solo texto</option>
                                         <option value="image">Con imagen</option>
                                     </select>
+
                                     {newReason.type === 'image' && (
-                                        <input
-                                            value={newReason.imageUrl}
-                                            onChange={(e) => setNewReason({ ...newReason, imageUrl: e.target.value })}
-                                            placeholder="URL de la imagen"
-                                            className="flex-1 p-2 rounded-lg border border-gray-200"
-                                        />
+                                        <>
+                                            <input
+                                                value={newReason.imageUrl}
+                                                onChange={(e) => setNewReason({ ...newReason, imageUrl: e.target.value })}
+                                                placeholder="URL de la imagen"
+                                                className="flex-1 p-2 rounded-lg border border-gray-200"
+                                            />
+                                            <span className="text-gray-500">o</span>
+                                            <input
+                                                ref={fileInputRef}
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => handleFileSelect(e)}
+                                                className="hidden"
+                                            />
+                                            <button
+                                                onClick={() => fileInputRef.current?.click()}
+                                                className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+                                                disabled={uploading}
+                                            >
+                                                {uploading ? '📤 Subiendo...' : '📁 Subir imagen'}
+                                            </button>
+                                        </>
                                     )}
                                 </div>
+
+                                {imagePreview && (
+                                    <div className="relative w-32 h-32">
+                                        <img src={imagePreview} alt="Preview" className="w-full h-full object-cover rounded-lg" />
+                                        <button
+                                            onClick={() => {
+                                                setImagePreview(null);
+                                                setNewReason({ ...newReason, imageUrl: '' });
+                                            }}
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-sm"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                )}
+
                                 <input
                                     value={newReason.spotifyUrl}
                                     onChange={(e) => setNewReason({ ...newReason, spotifyUrl: e.target.value })}
-                                    placeholder="URL de Spotify (opcional)"
+                                    placeholder="URL de Spotify (opcional) - cualquier formato"
                                     className="w-full p-2 rounded-lg border border-gray-200"
                                 />
-                                <button onClick={handleAddReason} className="glossy-button text-sm py-2">
+                                <button onClick={handleAddReason} className="glossy-button text-sm py-2" disabled={uploading}>
                                     Añadir Razón
                                 </button>
                             </div>
@@ -235,21 +344,78 @@ export function AdminPage({ onBack }: AdminPageProps) {
                             {/* Reasons List */}
                             <div className="space-y-2 max-h-96 overflow-y-auto">
                                 {reasons.map((reason) => (
-                                    <div key={reason.id} className="p-3 bg-white/50 rounded-lg flex justify-between items-start gap-2">
-                                        <div className="flex-1">
-                                            <p className="text-gray-800">{reason.content}</p>
-                                            <div className="flex gap-2 mt-1 text-xs text-gray-500">
-                                                <span>📝 {reason.type}</span>
-                                                {reason.imageUrl && <span>🖼️ imagen</span>}
-                                                {reason.spotifyUrl && <span>🎵 spotify</span>}
+                                    <div key={reason.id} className="p-3 bg-white/50 rounded-lg">
+                                        {editingId === reason.id ? (
+                                            /* Edit Form */
+                                            <div className="space-y-2">
+                                                <textarea
+                                                    value={editForm.content}
+                                                    onChange={(e) => setEditForm({ ...editForm, content: e.target.value })}
+                                                    className="w-full p-2 rounded-lg border border-gray-200 resize-none"
+                                                    rows={2}
+                                                />
+                                                <div className="flex gap-2 flex-wrap">
+                                                    <select
+                                                        value={editForm.type}
+                                                        onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
+                                                        className="p-2 rounded-lg border border-gray-200 text-sm"
+                                                    >
+                                                        <option value="text">Texto</option>
+                                                        <option value="image">Imagen</option>
+                                                    </select>
+                                                    {editForm.type === 'image' && (
+                                                        <input
+                                                            value={editForm.imageUrl}
+                                                            onChange={(e) => setEditForm({ ...editForm, imageUrl: e.target.value })}
+                                                            placeholder="URL imagen"
+                                                            className="flex-1 p-2 rounded-lg border border-gray-200 text-sm"
+                                                        />
+                                                    )}
+                                                </div>
+                                                <input
+                                                    value={editForm.spotifyUrl}
+                                                    onChange={(e) => setEditForm({ ...editForm, spotifyUrl: e.target.value })}
+                                                    placeholder="URL Spotify"
+                                                    className="w-full p-2 rounded-lg border border-gray-200 text-sm"
+                                                />
+                                                <div className="flex gap-2">
+                                                    <button onClick={handleSaveEdit} className="px-3 py-1 bg-green-500 text-white rounded-lg text-sm">
+                                                        ✓ Guardar
+                                                    </button>
+                                                    <button onClick={handleCancelEdit} className="px-3 py-1 bg-gray-400 text-white rounded-lg text-sm">
+                                                        ✕ Cancelar
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <button
-                                            onClick={() => handleDeleteReason(reason.id)}
-                                            className="text-red-500 hover:text-red-700 px-2"
-                                        >
-                                            🗑️
-                                        </button>
+                                        ) : (
+                                            /* Display Mode */
+                                            <div className="flex justify-between items-start gap-2">
+                                                <div className="flex-1">
+                                                    <p className="text-gray-800">{reason.content}</p>
+                                                    <div className="flex gap-2 mt-1 text-xs text-gray-500">
+                                                        <span>📝 {reason.type}</span>
+                                                        {reason.imageUrl && <span>🖼️ imagen</span>}
+                                                        {reason.spotifyUrl && <span>🎵 spotify</span>}
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-1">
+                                                    <button
+                                                        onClick={() => handleStartEdit(reason)}
+                                                        className="text-blue-500 hover:text-blue-700 px-2"
+                                                        title="Editar"
+                                                    >
+                                                        ✏️
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteReason(reason.id)}
+                                                        className="text-red-500 hover:text-red-700 px-2"
+                                                        title="Eliminar"
+                                                    >
+                                                        🗑️
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
