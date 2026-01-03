@@ -33,6 +33,17 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Verify environment variables
+        env:
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+        run: |
+          if [ -z "$VITE_FIREBASE_API_KEY" ]; then
+            echo "::error::VITE_FIREBASE_API_KEY secret is not set!"
+            exit 1
+          else
+            echo "✅ VITE_FIREBASE_API_KEY is set (length: ${#VITE_FIREBASE_API_KEY})"
+          fi
+
       - name: Build
         run: npm run build
         env:
