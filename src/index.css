@@ -12,30 +12,32 @@
   --color-grass: #7CB342;
   --color-cyan-bright: #00D4FF;
   --color-cyan-glow: #00E5FF;
-  
+
   /* Glass/Aero Colors */
   --color-glass-white: rgba(255, 255, 255, 0.85);
   --color-glass-light: rgba(255, 255, 255, 0.6);
   --color-glass-ultra: rgba(255, 255, 255, 0.95);
   --color-glass-border: rgba(255, 255, 255, 0.8);
-  
+
   /* Accent Colors */
   --color-love-pink: #FF69B4;
   --color-love-rose: #FF1493;
   --color-love-deep: #C71585;
-  
+
   /* Shadows */
   --shadow-aero: 0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
   --shadow-glossy: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 12px rgba(0, 0, 0, 0.2);
   --shadow-button: 0 4px 15px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5);
   --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.2), 0 2px 10px rgba(0, 0, 0, 0.1);
-  
+
   /* Fonts */
   --font-family-sans: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* Base Styles */
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -49,36 +51,32 @@ body {
 
 /* Frutiger Aero Background - "Bliss" inspired */
 .aero-background {
-  background: 
+  background:
     /* Clouds overlay */
     radial-gradient(ellipse 120% 80% at 20% 20%, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
     radial-gradient(ellipse 100% 60% at 80% 30%, rgba(255, 255, 255, 0.3) 0%, transparent 40%),
     /* Sky gradient */
-    linear-gradient(
-      180deg,
+    linear-gradient(180deg,
       #4AB3E2 0%,
       #87CEEB 30%,
       #B5E4F7 50%,
       #7CB342 51%,
       #8BC34A 60%,
       #9CCC65 80%,
-      #B4D455 100%
-    );
+      #B4D455 100%);
   min-height: 100vh;
 }
 
 /* Glossy Button Base */
 .glossy-button {
-  background: linear-gradient(
-    180deg,
-    #FF85C0 0%,
-    #FF69B4 30%,
-    #FF1493 70%,
-    #C71585 100%
-  );
+  background: linear-gradient(180deg,
+      #FF85C0 0%,
+      #FF69B4 30%,
+      #FF1493 70%,
+      #C71585 100%);
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 9999px;
-  box-shadow: 
+  box-shadow:
     /* Outer shadow */
     0 4px 15px rgba(199, 21, 133, 0.4),
     0 8px 25px rgba(0, 0, 0, 0.2),
@@ -104,24 +102,20 @@ body {
   left: 0;
   right: 0;
   height: 50%;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.4) 0%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.4) 0%,
+      rgba(255, 255, 255, 0.1) 100%);
   border-radius: 9999px 9999px 50% 50%;
   pointer-events: none;
 }
 
 .glossy-button:hover {
-  background: linear-gradient(
-    180deg,
-    #FF9ED0 0%,
-    #FF7BC0 30%,
-    #FF2DA0 70%,
-    #D61E90 100%
-  );
-  box-shadow: 
+  background: linear-gradient(180deg,
+      #FF9ED0 0%,
+      #FF7BC0 30%,
+      #FF2DA0 70%,
+      #D61E90 100%);
+  box-shadow:
     0 6px 20px rgba(199, 21, 133, 0.5),
     0 10px 30px rgba(0, 0, 0, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.7),
@@ -130,7 +124,7 @@ body {
 
 .glossy-button:active {
   transform: translateY(2px);
-  box-shadow: 
+  box-shadow:
     0 2px 10px rgba(199, 21, 133, 0.4),
     0 4px 15px rgba(0, 0, 0, 0.2),
     inset 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -138,17 +132,15 @@ body {
 
 /* Glass Card (Aero Style) */
 .glass-card {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(255, 255, 255, 0.7) 50%,
-    rgba(240, 248, 255, 0.8) 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0.7) 50%,
+      rgba(240, 248, 255, 0.8) 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.9);
   border-radius: 16px;
-  box-shadow: 
+  box-shadow:
     0 10px 40px rgba(0, 0, 0, 0.15),
     0 2px 10px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 1),
@@ -165,28 +157,24 @@ body {
   left: 0;
   right: 0;
   height: 60%;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.5) 0%,
-    rgba(255, 255, 255, 0.1) 60%,
-    transparent 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.5) 0%,
+      rgba(255, 255, 255, 0.1) 60%,
+      transparent 100%);
   pointer-events: none;
   border-radius: 16px 16px 50% 50%;
 }
 
 /* Google Sign-in Button (Glossy Style) */
 .google-button {
-  background: linear-gradient(
-    180deg,
-    #FFFFFF 0%,
-    #F8F8F8 30%,
-    #E8E8E8 70%,
-    #D8D8D8 100%
-  );
+  background: linear-gradient(180deg,
+      #FFFFFF 0%,
+      #F8F8F8 30%,
+      #E8E8E8 70%,
+      #D8D8D8 100%);
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 9999px;
-  box-shadow: 
+  box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 1),
     inset 0 -1px 0 rgba(0, 0, 0, 0.05);
@@ -210,37 +198,31 @@ body {
   left: 0;
   right: 0;
   height: 50%;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.8) 0%,
-    rgba(255, 255, 255, 0.2) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.8) 0%,
+      rgba(255, 255, 255, 0.2) 100%);
   pointer-events: none;
 }
 
 .google-button:hover {
-  background: linear-gradient(
-    180deg,
-    #FFFFFF 0%,
-    #FAFAFA 30%,
-    #F0F0F0 70%,
-    #E0E0E0 100%
-  );
-  box-shadow: 
+  background: linear-gradient(180deg,
+      #FFFFFF 0%,
+      #FAFAFA 30%,
+      #F0F0F0 70%,
+      #E0E0E0 100%);
+  box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 /* Photo Frame Style */
 .photo-frame {
-  background: linear-gradient(
-    135deg,
-    #FFFFFF 0%,
-    #F5F5F5 100%
-  );
+  background: linear-gradient(135deg,
+      #FFFFFF 0%,
+      #F5F5F5 100%);
   border: 3px solid #fff;
   border-radius: 12px;
-  box-shadow: 
+  box-shadow:
     0 4px 20px rgba(0, 0, 0, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 1);
   padding: 8px;
@@ -255,16 +237,14 @@ body {
 
 /* Counter Widget */
 .counter-widget {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.9) 0%,
-    rgba(240, 248, 255, 0.85) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(240, 248, 255, 0.85) 100%);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.8);
   border-radius: 20px;
-  box-shadow: 
+  box-shadow:
     0 2px 10px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 1);
   padding: 8px 20px;
@@ -290,8 +270,15 @@ body {
 
 /* Animation helpers */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .floating {
@@ -299,10 +286,157 @@ body {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(255, 105, 180, 0.4); }
-  50% { box-shadow: 0 0 40px rgba(255, 105, 180, 0.7); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(255, 105, 180, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(255, 105, 180, 0.7);
+  }
 }
 
 .pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Image Lightbox */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  color: white;
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10000;
+}
+
+.lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+}
+
+.lightbox-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.lightbox-image {
+  max-width: 95vw;
+  max-height: 95vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-hint {
+  position: absolute;
+  bottom: 20px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
+/* Photo frame clickable style */
+.photo-frame-clickable {
+  cursor: zoom-in;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.photo-frame-clickable:hover {
+  transform: scale(1.02);
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .lightbox-close {
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .lightbox-content {
+    padding: 8px;
+  }
+
+  .lightbox-image {
+    max-width: 98vw;
+    max-height: 95vh;
+  }
+
+  .lightbox-hint {
+    bottom: 12px;
+    font-size: 0.75rem;
+  }
+}
+
+/* Handle landscape orientation on mobile/tablet */
+@media (orientation: landscape) and (max-height: 600px) {
+  .lightbox-content {
+    padding: 8px;
+  }
+
+  .lightbox-image {
+    max-width: 95vw;
+    max-height: 92vh;
+  }
+
+  .lightbox-close {
+    top: 8px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .lightbox-hint {
+    display: none;
+  }
+}
+
+/* Very small screens (phones in portrait) */
+@media (max-width: 480px) {
+  .lightbox-image {
+    max-width: 100vw;
+    max-height: 95vh;
+    border-radius: 0;
+  }
+
+  .lightbox-content {
+    padding: 0;
+  }
 }

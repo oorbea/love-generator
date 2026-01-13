@@ -20,7 +20,7 @@ interface MainContentProps {
 
 function MainContent({ onAdminClick, isAdmin }: MainContentProps) {
     const { signOut, user } = useAuth();
-    const { currentReason, getRandomReason, viewedCount, loading } = useReasons();
+    const { currentReason, getRandomReason, viewedCount, loading } = useReasons(user?.uid || null);
 
     const handleNextReason = useCallback(() => {
         getRandomReason();
