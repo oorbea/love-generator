@@ -149,8 +149,9 @@ jobs:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
           sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no "$SSH_USER@$SSH_HOST" << ENDSSH
+            set -e
             cd $DEPLOY_PATH
             docker compose pull
-            docker compose up -d --remove-orphans
+            docker compose up -d --pull always --remove-orphans
             docker image prune -f
           ENDSSH
